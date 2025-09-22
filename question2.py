@@ -2,7 +2,7 @@ import re, requests, pandas as pd
 import time
 from dataclasses import dataclass
 from datetime import datetime
-from sqlalchemy import create_engine, text, String, Integer, DateTime, MetaData
+from sqlalchemy import create_engine, String, Integer, DateTime, MetaData
 
 from bs4 import BeautifulSoup
 from sqlalchemy.orm import sessionmaker, DeclarativeBase, Mapped, mapped_column
@@ -85,18 +85,18 @@ class SpimexParser:
         ignore_words = (
             "Маклер СПбМТСБ",
             "Маклер АО Петербургская Биржа",
+            "Итого:",
+            "Итого по секции:",
             "25/25",
             "24/24",
             "22/22",
             "21/21",
             "20/20",
             "19/19",
-            "19/19",
-            "16/16",
+            "18/18",
             "17/17",
+            "16/16",
             "15/15",
-            "Итого:",
-            "Итого по секции:",
         )
         for entry in range(0, len(entries_list)):
             current_entry = entries_list.iloc[entry]
@@ -177,7 +177,7 @@ while True:
 
     for i, link in enumerate(links):
         LINK_XLS_URL = f"https://spimex.com{link['href']}"
-        print(f"Обрабатывается страница - {PAGE_NUMBER}, файл № - {i}")
+        print(f"Обрабатывается страница - {PAGE_NUMBER}, файл № - {i + 1}")
         try:
             response = requests.get(LINK_XLS_URL)
             response.raise_for_status()
@@ -224,9 +224,7 @@ while True:
 
     PAGE_NUMBER += 1
 
-    if parser_spimex.date == datetime.strptime(
-        "2023-01-09 00:00:00", "%Y-%d-%m %H:%M:%S"
-    ):
+    if len(links) < 10:
         break
 
 end_time = time.time()
@@ -236,3 +234,4 @@ total_count = session.query(SpimexTradingResultsBase).count()
 print(f"Общее количество записей в базе данных - {total_count}")
 print(f"Общее время выполнения программы - {duration} минут")
 print(f"Общее количество ошибок за время выполнения программы - {session_exceptions}")
+session.close()
