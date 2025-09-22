@@ -15,7 +15,7 @@ class Trade:
     exchange_product_id: str | None = None
     exchange_product_name: str | None = None
     oil_id: str | None = None
-    delivery_basis_id : str | None = None
+    delivery_basis_id: str | None = None
     delivery_basis_name: str | None = None
     delivery_type_id: str | None = None
     volume: int | None = None
@@ -30,41 +30,97 @@ class SpimexParser:
     def __init__(self, path: str):
         self.path = path
         self.exel_file = pd.read_excel(self.path)
-        self.date = datetime.strptime(self.exel_file.iloc[2]['Форма СЭТ-БТ'].replace('Дата торгов: ', ''), '%d.%m.%Y')
+        self.date = datetime.strptime(
+            self.exel_file.iloc[2]["Форма СЭТ-БТ"].replace("Дата торгов: ", ""),
+            "%d.%m.%Y",
+        )
         self.trade_list = []
 
     def parse(self):
         exel_file = pd.read_excel(self.path)
-        row_number = int(exel_file[exel_file['Форма СЭТ-БТ'] == 'Единица измерения: Метрическая тонна'].index[0]) + 4
-        data_columns = ['pass1', 'exchange_product_id', 'exchange_product_name',
-                        'delivery_basis_name', 'volume', 'total', 'pass2'
-            , 'pass3', 'pass4', 'pass5', 'pass6', 'pass7', 'pass8', 'pass9', 'count']
-        columns_to_drop = ['pass1', 'pass2', 'pass3', 'pass4', 'pass5', 'pass6', 'pass7', 'pass8', 'pass9']
-        exel_file = pd.read_excel(self.path,
-                                  skiprows=row_number,
-                                  header=None,
-                                  names=data_columns
-                                  )
+        row_number = (
+            int(
+                exel_file[
+                    exel_file["Форма СЭТ-БТ"] == "Единица измерения: Метрическая тонна"
+                ].index[0]
+            )
+            + 4
+        )
+        data_columns = [
+            "pass1",
+            "exchange_product_id",
+            "exchange_product_name",
+            "delivery_basis_name",
+            "volume",
+            "total",
+            "pass2",
+            "pass3",
+            "pass4",
+            "pass5",
+            "pass6",
+            "pass7",
+            "pass8",
+            "pass9",
+            "count",
+        ]
+        columns_to_drop = [
+            "pass1",
+            "pass2",
+            "pass3",
+            "pass4",
+            "pass5",
+            "pass6",
+            "pass7",
+            "pass8",
+            "pass9",
+        ]
+        exel_file = pd.read_excel(
+            self.path, skiprows=row_number, header=None, names=data_columns
+        )
         exel_file = exel_file.drop(columns=columns_to_drop, axis=1)
         return exel_file
 
     def read_data(self):
         entries_list = self.parse()
-        ignore_words = ('Маклер СПбМТСБ','Маклер АО Петербургская Биржа','25/25','24/24','22/22','21/21','20/20','19/19','19/19','16/16','17/17','15/15','Итого:','Итого по секции:',)
+        ignore_words = (
+            "Маклер СПбМТСБ",
+            "Маклер АО Петербургская Биржа",
+            "25/25",
+            "24/24",
+            "22/22",
+            "21/21",
+            "20/20",
+            "19/19",
+            "19/19",
+            "16/16",
+            "17/17",
+            "15/15",
+            "Итого:",
+            "Итого по секции:",
+        )
         for entry in range(0, len(entries_list)):
             current_entry = entries_list.iloc[entry]
-            if current_entry['count'] != '-' and current_entry['exchange_product_id'] not in ignore_words:
+            if (
+                current_entry["count"] != "-"
+                and current_entry["exchange_product_id"] not in ignore_words
+            ):
                 trade = Trade(
-                    exchange_product_id=entries_list.iloc[entry]['exchange_product_id'],
-                    exchange_product_name=entries_list.iloc[entry]['exchange_product_name'],
-                    oil_id=entries_list.iloc[entry]['exchange_product_id'][:4],
-                    delivery_basis_id=entries_list.iloc[entry]['exchange_product_id'][4:7],
-                    delivery_basis_name=entries_list.iloc[entry]['delivery_basis_name'],
-                    delivery_type_id=entries_list.iloc[entry]['exchange_product_id'][-1],
-                    volume=int(entries_list.iloc[entry]['volume']),
-                    total=float(entries_list.iloc[entry]['total']),
-                    count=int(entries_list.iloc[entry]['count']),
-                    date=self.date
+                    exchange_product_id=entries_list.iloc[entry]["exchange_product_id"],
+                    exchange_product_name=entries_list.iloc[entry][
+                        "exchange_product_name"
+                    ],
+                    oil_id=entries_list.iloc[entry]["exchange_product_id"][:4],
+                    delivery_basis_id=entries_list.iloc[entry]["exchange_product_id"][
+                        4:7
+                    ],
+                    delivery_basis_name=entries_list.iloc[entry]["delivery_basis_name"],
+                    delivery_type_id=entries_list.iloc[entry]["exchange_product_id"][
+                        -1
+                    ],
+                    volume=int(entries_list.iloc[entry]["volume"]),
+                    total=float(entries_list.iloc[entry]["total"]),
+                    count=int(entries_list.iloc[entry]["count"]),
+                    date=self.date,
                 )
                 self.trade_list.append(trade)
         return self.trade_list
@@ -81,7 +137,7 @@ class SpimexTradingResultsBase(Base):
     exchange_product_id: Mapped[str] = mapped_column(String(20))
     exchange_product_name: Mapped[str] = mapped_column(String())
     oil_id: Mapped[str] = mapped_column(String(4))
-    delivery_basis_id : Mapped[str] = mapped_column(String(3))
+    delivery_basis_id: Mapped[str] = mapped_column(String(3))
     delivery_basis_name: Mapped[str] = mapped_column(String(50))
     delivery_type_id: Mapped[str] = mapped_column(String(1))
     volume: Mapped[int] = mapped_column(Integer)
@@ -92,8 +148,9 @@ class SpimexTradingResultsBase(Base):
     updated_on: Mapped[datetime] = mapped_column(DateTime)
 
 
-
-engine = create_engine('postgresql+psycopg2://postgres:Oblivion94$@localhost:5432/spimex_trading_results')
+engine = create_engine(
+    "postgresql+psycopg2://postgres:Oblivion94$@localhost:5432/spimex_trading_results"
+)
 metadata = MetaData()
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
@@ -105,29 +162,32 @@ session_exceptions = 0
 
 while True:
     URL = f"https://spimex.com/markets/oil_products/trades/results/?page=page-{PAGE_NUMBER}"
-    LINKS_PATTERN = re.compile(r'^/upload/reports/oil_xls/oil_xls_202([543]).*')
-    file_path = 'bulletin_file.xls'
+    LINKS_PATTERN = re.compile(r"^/upload/reports/oil_xls/oil_xls_202([543]).*")
+    file_path = "bulletin_file.xls"
     response = requests.get(URL)
     html = response.text
     soup = BeautifulSoup(html, "html.parser")
-    links = soup.find_all('a', attrs={'class': 'accordeon-inner__item-title link xls',
-                                      'href': re.compile(LINKS_PATTERN)})
-
+    links = soup.find_all(
+        "a",
+        attrs={
+            "class": "accordeon-inner__item-title link xls",
+            "href": re.compile(LINKS_PATTERN),
+        },
+    )
 
     for i, link in enumerate(links):
         LINK_XLS_URL = f"https://spimex.com{link['href']}"
-        print(f'Обрабатывается страница - {PAGE_NUMBER}, файл № - {i}')
+        print(f"Обрабатывается страница - {PAGE_NUMBER}, файл № - {i}")
         try:
             response = requests.get(LINK_XLS_URL)
             response.raise_for_status()
 
-            with open(file_path, 'wb') as f:
+            with open(file_path, "wb") as f:
                 f.write(response.content)
 
         except requests.exceptions.RequestException as e:
             session_exceptions += 1
             print(f"Ошибка при скачивании файла: {e}")
-
 
         try:
             parser_spimex = SpimexParser(file_path)
@@ -137,7 +197,6 @@ while True:
         except Exception as e:
             session_exceptions += 1
             print(f"Ошибка при чтении файла: {e}")
-
 
         try:
             with engine.connect() as connection:
@@ -154,7 +213,7 @@ while True:
                         count=obj.count,
                         date=obj.date,
                         created_on=obj.created_on,
-                        updated_on=obj.updated_on
+                        updated_on=obj.updated_on,
                     )
                     session.add(record)
                 session.commit()
@@ -165,15 +224,15 @@ while True:
 
     PAGE_NUMBER += 1
 
-    if parser_spimex.date == datetime.strptime('2023-01-09 00:00:00', '%Y-%d-%m %H:%M:%S'):
+    if parser_spimex.date == datetime.strptime(
+        "2023-01-09 00:00:00", "%Y-%d-%m %H:%M:%S"
+    ):
         break
 
 end_time = time.time()
 duration = (end_time - start_time) / 60
 
 total_count = session.query(SpimexTradingResultsBase).count()
-print(f'Общее количество записей в базе данных - {total_count}')
-print(f'Общее время выполнения программы - {duration} минут')
-print(f'Общее количество ошибок за время выполнения программы - {session_exceptions}')
-
-
+print(f"Общее количество записей в базе данных - {total_count}")
+print(f"Общее время выполнения программы - {duration} минут")
+print(f"Общее количество ошибок за время выполнения программы - {session_exceptions}")
