@@ -20,7 +20,7 @@ if __name__ == "__main__":
             file.download_file(link)
             records = parser.read_data()
             db.add_records(records)
-            print(f'Обработан файл за - {parser.date.date()}')
+            print(f"Обработан файл за - {parser.date.date()}")
 
         if len(links) < 10:
             break

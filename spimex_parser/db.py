@@ -12,7 +12,6 @@ class Database:
         Base.metadata.create_all(self.engine)
         self.Session = sessionmaker(bind=self.engine)
 
-
     def add_records(self, records):
         with self.Session() as session:
             try:
