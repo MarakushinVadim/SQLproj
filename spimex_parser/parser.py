@@ -8,6 +8,22 @@ from bs4 import BeautifulSoup
 from spimex_parser.models import Trade
 
 
+class SpimexXlsDownloader:
+    def __init__(self, file_path: str):
+        self.file_path = file_path
+
+    def download_file(self, link):
+        link_url = f"https://spimex.com{link['href']}"
+        try:
+            response = requests.get(link_url)
+            status = response.status_code
+            if status == 200:
+                with open(self.file_path, "wb") as f:
+                    f.write(response.content)
+        except Exception as e:
+            print(f"Ошибка при скачивании файла: {e}")
+
+
 class SpimexWebParser:
     def __init__(self, file_path: str, page_number: int = 1):
         self.file_path = file_path
@@ -40,17 +56,6 @@ class SpimexWebParser:
             self.page_number += 1
             self.url = f"https://spimex.com/markets/oil_products/trades/results/?page=page-{self.page_number}"
             return []
-
-    def download_file(self, link):
-        link_url = f"https://spimex.com{link['href']}"
-        try:
-            response = requests.get(link_url)
-            response.raise_for_status()
-
-            with open(self.file_path, "wb") as f:
-                f.write(response.content)
-        except Exception as e:
-            print(f"Ошибка при скачивании файла: {e}")
 
 
     def parse(self):

@@ -1,9 +1,8 @@
 import time
-from datetime import datetime
 
 from spimex_parser.db import Database
 from spimex_parser.models import SpimexTradingResultsBase
-from spimex_parser.parser import SpimexWebParser
+from spimex_parser.parser import SpimexWebParser, SpimexXlsDownloader
 
 if __name__ == "__main__":
     start_time = time.time()
@@ -12,12 +11,13 @@ if __name__ == "__main__":
     file_path = "bulletin_file.xls"
 
     parser = SpimexWebParser(file_path)
+    file = SpimexXlsDownloader(file_path)
 
     while True:
 
         links = parser.get_links()
         for link in links:
-            parser.download_file(link)
+            file.download_file(link)
             records = parser.read_data()
             db.add_records(records)
             print(f'Обработан файл за - {parser.date.date()}')
