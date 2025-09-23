@@ -13,11 +13,11 @@ class SpimexWebParser:
         self.file_path = file_path
         self.exel_file = None
         self.date = None
-        self.trade_list = []
+        self.trade_list = None
         self.page_number = page_number
         self.links_pattern = re.compile(r"^/upload/reports/oil_xls/oil_xls_202([543]).*")
         self.url = f"https://spimex.com/markets/oil_products/trades/results/?page=page-{self.page_number}"
-        self.links = []
+        self.links = None
 
     def get_links(self):
         try:
@@ -31,11 +31,14 @@ class SpimexWebParser:
                     "href": re.compile(self.links_pattern),
                 },
             )
+
             self.page_number += 1
+            self.url = f"https://spimex.com/markets/oil_products/trades/results/?page=page-{self.page_number}"
             return links
         except Exception as e:
             print(f"Ошибка при получении ссылок: {e}")
             self.page_number += 1
+            self.url = f"https://spimex.com/markets/oil_products/trades/results/?page=page-{self.page_number}"
             return []
 
     def download_file(self, link):
@@ -69,6 +72,7 @@ class SpimexWebParser:
         return exel_file
 
     def read_data(self):
+        self.trade_list = []
         entries_list = self.parse()
         for entry in range(len(entries_list)):
             try:
