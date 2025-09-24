@@ -1,8 +1,8 @@
 import time
 
-from spimex_parser.db import Database
-from spimex_parser.models import SpimexTradingResultsBase
-from spimex_parser.parser import SpimexWebParser, SpimexXlsDownloader
+from db import Database
+from models import SpimexTradingResultsBase
+from parser import SpimexWebParser, SpimexXlsDownloader
 
 if __name__ == "__main__":
     start_time = time.time()

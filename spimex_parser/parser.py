@@ -7,7 +7,7 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
-from spimex_parser.models import Trade
+from models import Trade
 
 
 logging.basicConfig(

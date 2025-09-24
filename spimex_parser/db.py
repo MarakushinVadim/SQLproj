@@ -1,8 +1,8 @@
 from sqlalchemy import create_engine, MetaData, select, exists
 from sqlalchemy.orm import sessionmaker
 
-from spimex_parser.config import Config
-from spimex_parser.models import Base, SpimexTradingResultsBase
+from config import Config
+from models import Base, SpimexTradingResultsBase
 
 
 class Database:
