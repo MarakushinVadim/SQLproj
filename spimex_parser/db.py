@@ -1,9 +1,14 @@
+import logging
 from sqlalchemy import create_engine, MetaData, select, exists
 from sqlalchemy.orm import sessionmaker
 
-from config import Config
-from models import Base, SpimexTradingResultsBase
+from spimex_parser.config import Config
+from spimex_parser.models import Base, SpimexTradingResultsBase
 
+
+logging.basicConfig()
+logging.getLogger('sqlalchemy.engine').setLevel(logging.DEBUG)
+logging.getLogger('sqlalchemy.dialects.postgresql').setLevel(logging.DEBUG)
 
 class Database:
     def __init__(self):
@@ -41,4 +46,4 @@ class Database:
             except Exception as e:
                 print(f"Ошибка при записи в БД: {e}")
                 session.rollback()
-                raise e
+                raise

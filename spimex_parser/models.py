@@ -32,7 +32,7 @@ class SpimexTradingResultsBase(Base):
     exchange_product_name: Mapped[str] = mapped_column(String())
     oil_id: Mapped[str] = mapped_column(String(4))
     delivery_basis_id: Mapped[str] = mapped_column(String(3))
-    delivery_basis_name: Mapped[str] = mapped_column(String(50))
+    delivery_basis_name: Mapped[str] = mapped_column(String(150))
     delivery_type_id: Mapped[str] = mapped_column(String(1))
     volume: Mapped[int] = mapped_column(Integer)
     total: Mapped[int] = mapped_column(Integer)
